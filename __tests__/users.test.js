@@ -33,7 +33,7 @@ describe("Test User class", function () {
     let isValid = await User.authenticate("test", "password");
     expect(isValid).toBeTruthy();
 
-    isValid =  await User.authenticate("test", "xxx");
+    isValid = await User.authenticate("test", "xxx");
     expect(isValid).toBeFalsy();
   });
 
@@ -49,6 +49,7 @@ describe("Test User class", function () {
   });
 
   test("can get", async function () {
+    User.updateLoginTimestamp("test");
     let u = await User.get("test");
     expect(u).toEqual({
       username: "test",
@@ -136,6 +137,6 @@ describe("Test messages part of User class", function () {
   });
 });
 
-afterAll(async function() {
+afterAll(async function () {
   await db.end();
 });
