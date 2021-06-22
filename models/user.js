@@ -1,5 +1,7 @@
 /** User class for message.ly */
 
+const { DB_URI } = require("../config");
+
 
 
 /** User of the site. */
@@ -10,7 +12,10 @@ class User {
    *    {username, password, first_name, last_name, phone}
    */
 
-  static async register({username, password, first_name, last_name, phone}) { }
+  static async register({ username, password, first_name, last_name, phone }) {
+    const result = await db.query();
+    return result.rows[0];
+  }
 
   /** Authenticate: is this username/password valid? Returns boolean. */
 
