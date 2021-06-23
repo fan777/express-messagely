@@ -1,3 +1,6 @@
+const express = require('express');
+const router = new express.Router();
+
 /** GET /:id - get detail of message.
  *
  * => {message: {id,
@@ -28,3 +31,4 @@
  *
  **/
 
+module.exports = router;

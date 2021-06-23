@@ -16,8 +16,8 @@ class User {
   static async register({ username, password, first_name, last_name, phone }) {
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
     const result = await db.query(
-      `INSERT INTO users (username, password, first_name, last_name, phone, join_at)
-       VALUES ($1, $2, $3, $4, $5, current_timestamp)
+      `INSERT INTO users (username, password, first_name, last_name, phone, join_at, last_login_at)
+       VALUES ($1, $2, $3, $4, $5, current_timestamp, current_timestamp)
        RETURNING username, password`,
       [username, hashedPassword, first_name, last_name, phone]
     );
@@ -33,8 +33,12 @@ class User {
        WHERE username = $1`,
       [username]
     );
+    if (!result.rows[0]) {
+      throw new ExpressError(`No such user: ${username}`, 400)
+    }
     const user = result.rows[0];
-    return await bcrypt.compare(password, user.password);
+    const valid = await bcrypt.compare(password, user.password);
+    return user && valid;
   }
 
   /** Update last_login_at for user */
@@ -102,7 +106,7 @@ class User {
        WHERE from_username = $1`,
       [username]
     );
-    let messages = result.rows.map(val => ({
+    return result.rows.map(val => ({
       id: val.id,
       body: val.body,
       sent_at: val.sent_at,
@@ -114,7 +118,6 @@ class User {
         phone: val.phone
       }
     }));
-    return messages;
   }
 
   /** Return messages to this user.
@@ -134,7 +137,7 @@ class User {
        WHERE to_username = $1`,
       [username]
     );
-    let messages = result.rows.map(val => ({
+    return result.rows.map(val => ({
       id: val.id,
       body: val.body,
       sent_at: val.sent_at,
@@ -146,7 +149,6 @@ class User {
         phone: val.phone
       }
     }));
-    return messages;
   }
 }
 
