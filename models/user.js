@@ -37,8 +37,7 @@ class User {
       throw new ExpressError(`No such user: ${username}`, 400)
     }
     const user = result.rows[0];
-    const valid = await bcrypt.compare(password, user.password);
-    return user && valid;
+    return user && await bcrypt.compare(password, user.password);
   }
 
   /** Update last_login_at for user */
